@@ -94,41 +94,48 @@ struct node
 	hash cnum;
 	uint clist[SIZE];
 	long long lazy;
+	bool ready;
 
 	void init()
 	{
 		cnum.init();
 		memset(clist,-1,sizeof(clist));
 		lazy=-1;
+		ready=true;
 	}
-
+	void push()
+	{
+		if(lazy==-1)
+		{
+			cnum.init();
+			lazy=-1;
+			for(int i=0;i<SIZE;i++)
+			{
+				cnum.add(clist[i],1);
+			}
+		}
+		ready=true;
+	}
 	void cover(int st,int end,int ic)
 	{
-		if(end-st+1==SIZE)
-		{
-			lazy=ic;
-			cnum.init();
-			return;
-		}
+		if(end-st+1==SIZE) lazy=ic;
 		else
 		{
 			if(lazy!=-1)
 			{
 				fill(clist,clist+SIZE,lazy);
-				cnum.add(lazy,SIZE);
 				lazy=-1;
 			}
-			//print(">>"<<st<<' '<<end);
 			for(int i=st;i<=end;i++)
 			{
-				cnum.add(clist[i],-1);
 				clist[i]=ic;
 			}
-			cnum.add(ic,end-st+1);
 		}
+		ready=false;
 	}
 	int count(int st,int end,uint ic)
 	{
+		if(!ready) push();
 		if(lazy!=-1)
 		{
 			if(ic==lazy) return (end-st+1);
@@ -219,7 +226,3 @@ int main()
 	}
 	return 0;
 }
-
-
-
-
